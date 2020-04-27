@@ -62,3 +62,10 @@ services:
   recurly.client:
     class: Drupal\recurly\RecurlyClient
     arguments: ['@config.factory', '@logger.factory', '@messenger']
+  recurly.webhook_event_dispatcher:
+    class: Drupal\recurly\RecurlyWebhookEventDispatcher
+    arguments: ['@event_dispatcher']
+  recurly.webhook_subscriber:
+    class: Drupal\recurly\EventSubscriber\WebhookSubscriber
+    tags:
+      - { name: 'event_subscriber' }

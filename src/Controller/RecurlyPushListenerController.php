@@ -3,6 +3,7 @@
 namespace Drupal\recurly\Controller;
 
 use Drupal\Core\Render\HtmlResponse;
+use Drupal\recurly\RecurlyPushNotification;
 
 /**
  * Default controller for the recurly module.
@@ -23,7 +24,8 @@ class RecurlyPushListenerController extends RecurlyController {
   public function processPushNotification($key, $subdomain = NULL) {
 
     // Verify that the subdomain matches the configured one if it was specified.
-    $subdomain_configured = $this->config('recurly.settings')->get('recurly_subdomain');
+    $subdomain_configured = $this->config('recurly.settings')
+      ->get('recurly_subdomain');
     if (!empty($subdomain) && $subdomain != $subdomain_configured) {
       $subdomain_error_text = 'Incoming push notification did not contain the proper subdomain key.';
       $this->getLogger('recurly')->warning($subdomain_error_text, []);
@@ -31,7 +33,8 @@ class RecurlyPushListenerController extends RecurlyController {
     }
 
     // Ensure that the push notification was sent with the proper key.
-    if ($key != $this->config('recurly.settings')->get('recurly_listener_key')) {
+    if ($key != $this->config('recurly.settings')
+      ->get('recurly_listener_key')) {
       // Log the failed attempt and bail.
       $url_key_error_text = 'Incoming push notification did not contain the proper URL key.';
       $this->getLogger('recurly')->warning($url_key_error_text, []);
@@ -40,7 +43,7 @@ class RecurlyPushListenerController extends RecurlyController {
 
     // Retrieve the POST XML and create a notification object from it.
     $post_xml = file_get_contents('php://input');
-    $notification = new \Recurly_PushNotification($post_xml);
+    $notification = new RecurlyPushNotification($post_xml);
 
     // Bail if this is an empty or invalid notification.
     if (empty($notification) || empty($notification->type)) {
@@ -49,11 +52,17 @@ class RecurlyPushListenerController extends RecurlyController {
 
     // Log the incoming push notification if enabled.
     if ($this->config('recurly.settings')->get('recurly_push_logging')) {
-      $this->getLogger('recurly')->notice('Incoming %type: <pre>@notification</pre>', [
-        '%type' => $notification->type,
-        '@notification' => print_r($notification, TRUE),
-      ]);
+      $this->getLogger('recurly')
+        ->notice('Incoming %type: <pre>@notification</pre>', [
+          '%type' => $notification->type,
+          '@notification' => print_r($notification, TRUE),
+        ]);
     }
+
+    // Dispatch notification-appropriate event.
+    /** @var \Drupal\recurly\RecurlyWebhookEventDispatcher $webhook_event_dispatcher */
+    $webhook_event_dispatcher = \Drupal::service('recurly.webhook_event_dispatcher');
+    $webhook_event_dispatcher->dispatchEvent($notification, $subdomain);
 
     // If this is a new, canceled, or updated account set the database record.
     if (in_array($notification->type, [
@@ -87,11 +96,13 @@ class RecurlyPushListenerController extends RecurlyController {
         // First try to match based on the account code.
         // i.e. "user-1" would match the user with UID 1.
         $parts = explode('-', $recurly_account->account_code);
-        $entity_type = $this->config('recurly.settings')->get('recurly_entity_type');
+        $entity_type = $this->config('recurly.settings')
+          ->get('recurly_entity_type');
         if ($parts[0] === $entity_type) {
-          if (isset($parts[1]) && is_numeric($parts[1]) && ($entity = $this->entityTypeManager()->getStorage($parts[0], [
-            $parts[1],
-          ]))) {
+          if (isset($parts[1]) && is_numeric($parts[1]) && ($entity = $this->entityTypeManager()
+            ->getStorage($parts[0], [
+              $parts[1],
+            ]))) {
             recurly_account_save($recurly_account, $entity_type, $parts[1]);
           }
         }
