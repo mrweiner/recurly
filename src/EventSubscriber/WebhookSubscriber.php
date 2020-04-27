@@ -16,7 +16,7 @@ class WebhookSubscriber implements EventSubscriberInterface {
   /**
    * Get subscribed events.
    *
-   * @inheritdoc
+   * @inheritdoc 
    */
   public static function getSubscribedEvents() {
     $events[RecurlyWebhookEvents::SUCCESSFUL_PAYMENT][] = ['onSuccessfulPayment'];
@@ -26,7 +26,7 @@ class WebhookSubscriber implements EventSubscriberInterface {
   /**
    * Successful payment event handler.
    *
-   * @param \Drupal\recurly\Event\RecurlySuccessfulPaymentEvent $event
+   * @param \Drupal\recurly\Event\notifications\payment\RecurlySuccessfulPaymentEvent $event
    *   The subscribed event.
    */
   public function onSuccessfulPayment(RecurlySuccessfulPaymentEvent $event) {
