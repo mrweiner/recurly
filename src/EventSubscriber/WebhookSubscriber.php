@@ -2,7 +2,7 @@
 
 namespace Drupal\recurly\EventSubscriber;
 
-use Drupal\recurly\Event\RecurlySuccessfulPaymentEvent;
+use Drupal\recurly\Event\notifications\payment\RecurlySuccessfulPaymentEvent;
 use Drupal\recurly\Event\RecurlyWebhookEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
