@@ -105,7 +105,7 @@ class RecurlyPushNotification {
     if (!@simplexml_load_string ($post_xml)) {
       return;
     }
-    $xml = new SimpleXMLElement ($post_xml);
+    $xml = new \SimpleXMLElement ($post_xml);
 
     $this->type = $xml->getName();
 
