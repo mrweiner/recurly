@@ -97,10 +97,10 @@ class RecurlyClient {
     }
 
     // Required for the API.
-    \Recurly_Client::$apiKey = $account_settings['api_key'];
+    $client = new \Recurly\Client($account_settings['api_key']);
 
     $initialized = TRUE;
-    return TRUE;
+    return TRUE; 
   }
 
   /**
