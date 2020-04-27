@@ -11,6 +11,6 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
-    "recurly/recurly-client": "^2.7.0"
+    "recurly/recurly-client": "^3.1.0"
   }
 }
