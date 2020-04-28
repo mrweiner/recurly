@@ -11,6 +11,21 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
-    "recurly/recurly-client": "^3.1.0"
-  }
+    "mrweiner/recurly-client-php-v2": "2.12.13"
+  },
+  "repositories": [
+    {
+      "type": "package",
+      "package": {
+        "name": "mrweiner/recurly-client-php-v2",
+        "version": "2.12.13",
+        "type": "vendor",
+        "source": {
+          "url": "https://github.com/mrweiner/recurly-client-php.git",
+          "type": "git",
+          "reference": "c9f67565"
+        }
+      }
+    }
+  ]
 }
